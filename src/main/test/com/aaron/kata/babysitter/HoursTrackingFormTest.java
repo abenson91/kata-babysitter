@@ -38,7 +38,7 @@ public class HoursTrackingFormTest {
         tested.setStartTime(validTimeInput);
         tested.setEndTime(validTimeInput);
         assertEquals("Start time was not correctly set", validTimeInput, tested.getStartTime());
-        assertEquals("End time was not correctly set", validTimeInput, tested.getStartTime());
+        assertEquals("End time was not correctly set", validTimeInput, tested.getEndTime());
     }
 
     @Test
