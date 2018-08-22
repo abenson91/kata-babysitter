@@ -3,15 +3,32 @@
 
 <head>
     <title>Babysitter Salary Calculator</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html"/>
 </head>
 
 <body>
 <h1>Hours Input</h1>
-<form method="post">
-    <p>Start Time: <input type="time" /></p>
-    <p>End Time: <input type="time" /></p>
-    <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+<form action="#" th:action="@{/}" th:object="${hoursTrackingForm}" method="post">
+    <table>
+        <tr>
+            <td>Start Time:</td>
+            <td><input type="date" th:field="*{startTime}"/></td>
+            <td th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}">Start Time Error</td>
+        </tr>
+        <tr>
+            <td>End Time:</td>
+            <td><input type="date" th:field="*{endTime}"/></td>
+            <td th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}">End Time Error</td>
+        </tr>
+        <tr>
+            <td>
+                <button type="submit">Submit</button>
+            </td>
+            <td>
+                <button type="reset" onclick="location.href='/'">Reset</button>
+            </td>
+        </tr>
+    </table>
 </form>
 
 </body>

@@ -3,15 +3,11 @@ package com.aaron.kata.babysitter;
 import org.joda.time.DateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
-
+@InputHoursConstraint
 public class HoursTrackingForm {
-
-    @NotNull(message = "Please enter a valid time in AM or PM")
+    private static final Integer DATE_ROLL_HOUR = 4;
     @DateTimeFormat(pattern = "hh:mma")
     private DateTime startTime;
-
-    @NotNull(message = "Please enter a valid time in AM or PM")
     @DateTimeFormat(pattern = "hh:mma")
     private DateTime endTime;
 
@@ -20,7 +16,11 @@ public class HoursTrackingForm {
     }
 
     public void setStartTime(DateTime startTime) {
-        this.startTime = startTime;
+        if (startTime != null && startTime.getHourOfDay() <= DATE_ROLL_HOUR) {
+            this.startTime = startTime.plusDays(1);
+        } else {
+            this.startTime = startTime;
+        }
     }
 
     public DateTime getEndTime() {
@@ -28,7 +28,11 @@ public class HoursTrackingForm {
     }
 
     public void setEndTime(DateTime endTime) {
-        this.endTime = endTime;
+        if (endTime != null && endTime.getHourOfDay() <= DATE_ROLL_HOUR) {
+            this.endTime = endTime.plusDays(1);
+        } else {
+            this.endTime = endTime;
+        }
     }
 
     @Override
