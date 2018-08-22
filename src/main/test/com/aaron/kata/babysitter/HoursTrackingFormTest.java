@@ -1,6 +1,8 @@
 package com.aaron.kata.babysitter;
 
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,8 +10,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,6 @@ import static org.junit.Assert.assertFalse;
  * be tested in the mvc controllers test
  */
 public class HoursTrackingFormTest {
-    private static final String HOURS_INPUT_FORMAT = "hh:mma";
     private Validator validator;
     private HoursTrackingForm tested;
 
@@ -33,8 +32,7 @@ public class HoursTrackingFormTest {
 
     @Test
     public void testValidTimeInputs() throws Exception {
-        SimpleDateFormat timeFormatForDate = new SimpleDateFormat(HOURS_INPUT_FORMAT);
-        Date validTimeInput = timeFormatForDate.parse("12:30pm");
+        DateTime validTimeInput = DateTime.parse("12:30pm", DateTimeFormat.forPattern("hh:mma"));
         tested.setStartTime(validTimeInput);
         tested.setEndTime(validTimeInput);
         assertEquals("Start time was not correctly set", validTimeInput, tested.getStartTime());
