@@ -21,15 +21,12 @@ public class HoursCalculationServiceImpl implements HoursCalculationService {
     private static final BigDecimal AFTER_BED_SALARY = BigDecimal.valueOf(8.00);
     private static final BigDecimal AFTER_MIDNIGHT_SALARY = BigDecimal.valueOf(16.00);
     private static final Integer TWO_DECIMAL_PLACES = 2;
-    private static final Integer DATE_ROLL_HOUR = 4;
 
     @Override
-    public String calculateSalaryEarned(DateTime startTime, DateTime endTime) throws RuntimeException {
+    public String calculateSalaryEarned(DateTime startTime, DateTime endTime) {
 
-        if (startTime.getHourOfDay() <= DATE_ROLL_HOUR) startTime = startTime.plusDays(1);
-        if (endTime.getHourOfDay() <= DATE_ROLL_HOUR) endTime = endTime.plusDays(1);
-        validateStartTime(startTime);
-        validateEndTime(startTime, endTime);
+        roundToNearestHour(startTime);
+        roundToNearestHour(endTime);
         Interval intervalWorked = new Interval(startTime, endTime);
         Integer hoursWorkedBeforeBed = calculateHoursWorkedBeforeBed(intervalWorked);
         Integer hoursWorkedAfterBedBeforeMidnight = calculateHoursWorkedAfterBedBeforeMidnight(intervalWorked);
@@ -43,19 +40,9 @@ public class HoursCalculationServiceImpl implements HoursCalculationService {
         return formatWagesAsDollarValue(calculatedWages);
     }
 
-    private void validateStartTime(DateTime startTime) throws RuntimeException {
-        if (startTime.isBefore(DateTime.parse(EARLIEST_START_TIME, HOURS_TIME_FORMAT))) {
-            throw new RuntimeException("Start time was before 5:00pm or after 4:00am");
-        } else if (startTime.isAfter(DateTime.parse(LATEST_END_TIME, HOURS_TIME_FORMAT).plusDays(1))) {
-            throw new RuntimeException("Start time was before 5:00pm or after 4:00am");
-        }
-    }
-
-    private void validateEndTime(DateTime startTime, DateTime endTime) throws RuntimeException {
-        if (!endTime.isAfter(startTime)) {
-            throw new RuntimeException("End time was before start time");
-        } else if (endTime.isAfter(DateTime.parse(LATEST_END_TIME, HOURS_TIME_FORMAT).plusDays(1))) {
-            throw new RuntimeException("End time was before after 4:00am");
+    private void roundToNearestHour(DateTime hourToRound) {
+        if (hourToRound.getMinuteOfHour() > 0) {
+            hourToRound = hourToRound.plusHours(1);
         }
     }
 
