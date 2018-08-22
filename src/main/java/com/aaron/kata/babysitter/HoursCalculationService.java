@@ -4,5 +4,5 @@ import org.joda.time.DateTime;
 
 public interface HoursCalculationService {
 
-    String calculateSalaryEarned(DateTime startTime, DateTime endTime) throws Exception;
+    String calculateSalaryEarned(DateTime startTime, DateTime endTime);
 }
