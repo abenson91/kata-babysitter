@@ -5,22 +5,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest
+@SpringBootTest
+@AutoConfigureMockMvc
 public class HoursCalculationControllerTest {
 
     @Autowired
@@ -32,83 +31,212 @@ public class HoursCalculationControllerTest {
     }
 
     @Test
-    public void testHomePageIsDisplayedWithFormBoxes() throws Exception {
-        mvc.perform(get("/"))
+    public void givenHomePageUrl_getViewWithStartAndEndTime() throws Exception {
+        mvc.perform(get("/").accept(MediaType.TEXT_HTML))
                 .andDo(print())
+                .andExpect(view().name("index"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Start Time:")))
-                .andExpect(content().string(containsString("End Time:")));
+                .andExpect(content().string(containsString("End Time:")))
+                .andDo(print());
     }
 
     @Test
-    public void testSuccessfulInputSubmissionRedirectsToResults() throws Exception {
-        MvcResult result = mvc.perform(post("/")
+    public void givenSuccessfulInput_redirectToResults_andDisplayCorrectSalaryEarned() throws Exception {
+        mvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("startTime", "5:30PM")
-                .param("endTime", "3:30AM")).andReturn();
+                .param("endTime", "3:30AM"))
+                .andExpect(view().name("results"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Salary earned is: $120.00")))
+                .andDo(print());
 
-        assertEquals("redirect:/results",result.getModelAndView().getViewName());
-        content().string(containsString("Salary Earned:"));
     }
 
     @Test
-    public void testNullInputErrorMessage() throws Exception {
-       mvc.perform(post("/")
+    public void givenNullInputMessages_expectValidationMessage() throws Exception {
+        mvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("startTime", "")
-                .param("endTime", "")
-       ).andExpect(content().string(containsString("Please enter a valid time in AM or PM")));
+                .param("endTime", ""))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "startTime",
+                        "InputHoursConstraint"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "InputHoursConstraint"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
-    public void testNonTimeUnitInputErrorMessage() throws Exception {
+    public void givenNonTimeUnitInput_expectInvalidInputErrorMessage() throws Exception {
         mvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("startTime", "5")
-                .param("endTime", "3")
-        ).andExpect(content().string(containsString("Invalid time format, please enter hours and minutes." +
-                " Example: 4:30pm")));
+                .param("endTime", "3"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "startTime",
+                        "typeMismatch"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "typeMismatch"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
-    public void testMilitaryTimeInputErrorMessage() throws Exception {
+    public void givenInputInMilitaryTimeInsteadOfAmPm_expectInvalidInputErrorMessage() throws Exception {
         mvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("startTime", "23:00")
-                .param("endTime", "15:00")
-        ).andExpect(content().string(containsString("Invalid time format, please enter hours and minutes." +
-                " Example: 4:30pm")));
+                .param("endTime", "00:00"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "startTime",
+                        "typeMismatch"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "typeMismatch"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
-    public void testMalformedHoursInputErrorMessage() throws Exception {
+    public void givenInputHasSpaces_expectInvalidInputErrorMessage() throws Exception {
         mvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("startTime", "3:00 PM")
-                .param("endTime", "1:00 AM")
-        ).andExpect(content().string(containsString("Invalid time format, please enter hours and minutes." +
-                " Example: 4:30pm")));
+                .param("startTime", "5:00 pm")
+                .param("endTime", "3:00 am"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "startTime",
+                        "typeMismatch"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "typeMismatch"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
-    public void testStartTimeFailsBefore5PM() throws Exception {
-        MvcResult result = mvc.perform(post("/")
+    public void givenInputIsMissingAmPm_expectInvalidInputErrorMessage() throws Exception {
+        mvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("startTime", "12:30PM")
-                .param("endTime", "3:30PM")).andReturn();
-
-        assertEquals("redirect:/error",result.getModelAndView().getViewName());
-        content().string(containsString("Start time entered was too early"));
+                .param("startTime", "5:00")
+                .param("endTime", "3:00"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "startTime",
+                        "typeMismatch"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "typeMismatch"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
-    public void testEndTimeFailsAfter4AM() throws Exception {
-        MvcResult result = mvc.perform(post("/")
+    public void givenStartTimeIsBefore5Pm_expectValidationErrorMessage() throws Exception {
+        mvc.perform(post("/")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("startTime", "12:30PM")
-                .param("endTime", "3:30PM")).andReturn();
-
-        assertEquals("redirect:/error",result.getModelAndView().getViewName());
-        content().string(containsString("End time entered was too late"));
+                .param("startTime", "4:00PM")
+                .param("endTime", "7:00PM"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "startTime",
+                        "InputHoursConstraint"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
+
+    @Test
+    public void givenEndTimeIsBefore5Pm_expectValidationErrorMessage() throws Exception {
+        mvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("startTime", "5:00PM")
+                .param("endTime", "4:00PM"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "InputHoursConstraint"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    public void givenStartTimeIsAfter4Am_expectValidationErrorMessage() throws Exception {
+        mvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("startTime", "5:00AM")
+                .param("endTime", "7:00PM"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "startTime",
+                        "InputHoursConstraint"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    public void givenEndTimeIsAfter4Am_expectValidationErrorMessage() throws Exception {
+        mvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("startTime", "5:00PM")
+                .param("endTime", "5:00AM"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "InputHoursConstraint"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    public void givenEndTimeIsBeforeStartTime_expectValidationErrorMessage() throws Exception {
+        mvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("startTime", "7:00PM")
+                .param("endTime", "5:00PM"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "InputHoursConstraint"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    public void givenEndTimeIsEqualToStartTime_expectValidationErrorMessage() throws Exception {
+        mvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("startTime", "7:00PM")
+                .param("endTime", "7:00PM"))
+                .andExpect(model().attributeHasFieldErrorCode(
+                        "hoursTrackingForm",
+                        "endTime",
+                        "InputHoursConstraint"))
+                .andExpect(view().name("index"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
 }

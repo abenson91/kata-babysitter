@@ -29,7 +29,7 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_InputHoursBeforeMidnight_Salary() throws Exception {
+    public void calculate_InputHoursBeforeMidnight_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
                 "36.00",
@@ -40,7 +40,7 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_InputHoursAfterBedAndBeforeMidnight_Salary() throws Exception {
+    public void calculate_InputHoursAfterBedAndBeforeMidnight_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
                 "32.00",
@@ -51,7 +51,7 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_InputAfterMidnight_Salary() throws Exception {
+    public void calculate_InputAfterMidnight_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
                 "64.00",
@@ -62,7 +62,7 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_InputBeforeBedUntilMidnight_Salary() throws Exception {
+    public void calculate_InputBeforeBedUntilMidnight_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
                 "68.00",
@@ -73,7 +73,7 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_MaxTimeWorked_Salary() throws Exception {
+    public void calculate_MaxTimeWorked_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
                 "132.00",
@@ -84,7 +84,7 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_AfterBedTimeUntilEndTime_Salary() throws Exception {
+    public void calculate_AfterBedTimeUntilEndTime_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
                 "96.00",
@@ -95,10 +95,10 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_WorkedPartialHourTimeRoundsUp_Salary() throws Exception {
+    public void calculate_WorkedPartialHourTimeRoundsUp_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
-                "104.00",
+                "120.00",
                 tested.calculateSalaryEarned(
                         DateTime.parse("05:01pm", timeFormatForTest),
                         DateTime.parse("3:59am", timeFormatForTest).plusDays(ROLL_TO_NEXT_DAY))
@@ -106,7 +106,7 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_OnlyOneHourWorked_Salary() throws Exception {
+    public void calculate_OnlyOneHourWorked_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
                 "12.00",
@@ -117,7 +117,7 @@ public class HoursCalculationServiceImplTest {
     }
 
     @Test
-    public void Calculate_WorkingNearPayChangeThreshold_Salary() throws Exception {
+    public void calculate_WorkingNearPayChangeThreshold_Salary() throws Exception {
         assertEquals(
                 "Calculated salary was incorrect",
                 "12.00",
