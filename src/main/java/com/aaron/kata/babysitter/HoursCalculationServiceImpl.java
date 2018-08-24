@@ -25,8 +25,8 @@ public class HoursCalculationServiceImpl implements HoursCalculationService {
     @Override
     public String calculateSalaryEarned(DateTime startTime, DateTime endTime) {
 
-        roundToNearestHour(startTime);
-        roundToNearestHour(endTime);
+        startTime = roundToNearestHour(startTime);
+        endTime = roundToNearestHour(endTime);
         Interval intervalWorked = new Interval(startTime, endTime);
         Integer hoursWorkedBeforeBed = calculateHoursWorkedBeforeBed(intervalWorked);
         Integer hoursWorkedAfterBedBeforeMidnight = calculateHoursWorkedAfterBedBeforeMidnight(intervalWorked);
@@ -40,10 +40,12 @@ public class HoursCalculationServiceImpl implements HoursCalculationService {
         return formatWagesAsDollarValue(calculatedWages);
     }
 
-    private void roundToNearestHour(DateTime hourToRound) {
+    private DateTime roundToNearestHour(DateTime hourToRound) {
         if (hourToRound.getMinuteOfHour() > 0) {
+            hourToRound = hourToRound.withMinuteOfHour(0);
             hourToRound = hourToRound.plusHours(1);
         }
+        return hourToRound;
     }
 
     private Integer calculateHoursWorkedBeforeBed(Interval intervalWorked) {
