@@ -2,6 +2,7 @@ package com.aaron.kata.babysitter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,10 +33,17 @@ public class HoursCalculationController implements WebMvcConfigurer {
     }
 
     @PostMapping("/")
-    public String submitHoursForCalculation(@Valid HoursTrackingForm hoursTrackingForm, BindingResult bindingResult) {
+    public String submitHoursForCalculation(@Valid HoursTrackingForm hoursTrackingForm,
+                                            BindingResult bindingResult,
+                                            Model model) {
         if (bindingResult.hasErrors()) {
             return "index";
         }
-        return "redirect:/results";
+        String salaryResults = hoursCalculationService.calculateSalaryEarned(
+                hoursTrackingForm.getStartTime(),
+                hoursTrackingForm.getEndTime());
+
+        model.addAttribute("salaryResults", salaryResults);
+        return "results";
     }
 }
