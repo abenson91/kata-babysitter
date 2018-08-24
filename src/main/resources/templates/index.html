@@ -11,6 +11,9 @@
 <form action="#" th:action="@{/}" th:object="${hoursTrackingForm}" method="post">
     <table>
         <tr>
+            <p>Input hours worked in hh:mm format with Am/Pm. For example 5:00PM</p>
+        </tr>
+        <tr>
             <td>Start Time:</td>
             <td><input type="date" th:field="*{startTime}"/></td>
             <td th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}">Start Time Error</td>

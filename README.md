@@ -16,3 +16,15 @@ The babysitter:
 *As a babysitter<br>
 In order to get paid for 1 night of work<br>
 I want to calculate my nightly charge<br>*
+
+## Assumption
+Bed time starts at 8PM
+
+## Run Instructions
+Requires Maven and Java 1.8
+
+From the command line navigate inside the kata-babysitter folder<br>
+Run command: mvn spring-boot:run<br>
+After output line "Started Application in x.xxx seconds" application will be running on localhost:8080/
+
+

@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @InputHoursConstraint
 public class HoursTrackingForm {
     private static final Integer DATE_ROLL_HOUR = 4;
+    private static final Integer ONE_DAY = 1;
     @DateTimeFormat(pattern = "hh:mma")
     private DateTime startTime;
     @DateTimeFormat(pattern = "hh:mma")
@@ -17,7 +18,7 @@ public class HoursTrackingForm {
 
     public void setStartTime(DateTime startTime) {
         if (startTime != null && startTime.getHourOfDay() <= DATE_ROLL_HOUR) {
-            this.startTime = startTime.plusDays(1);
+            this.startTime = startTime.plusDays(ONE_DAY);
         } else {
             this.startTime = startTime;
         }
@@ -29,7 +30,7 @@ public class HoursTrackingForm {
 
     public void setEndTime(DateTime endTime) {
         if (endTime != null && endTime.getHourOfDay() <= DATE_ROLL_HOUR) {
-            this.endTime = endTime.plusDays(1);
+            this.endTime = endTime.plusDays(ONE_DAY);
         } else {
             this.endTime = endTime;
         }
