@@ -8,6 +8,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class InputHoursValidator implements ConstraintValidator<InputHoursConstraint, HoursTrackingForm> {
+    private static final Integer ONE_DAY = 1;
     private static final DateTimeFormatter HOURS_TIME_FORMAT = DateTimeFormat.forPattern("hh:mma");
     private static final String EARLIEST_START_TIME = "5:00pm";
     private static final String LATEST_END_TIME = "4:00am";
@@ -26,7 +27,7 @@ public class InputHoursValidator implements ConstraintValidator<InputHoursConstr
                     .addPropertyNode("startTime").addConstraintViolation();
             isValid = false;
         } else if (value.getStartTime().isBefore(DateTime.parse(EARLIEST_START_TIME, HOURS_TIME_FORMAT))
-                || value.getStartTime().isAfter(DateTime.parse(LATEST_END_TIME, HOURS_TIME_FORMAT).plusDays(1))) {
+                || value.getStartTime().isAfter(DateTime.parse(LATEST_END_TIME, HOURS_TIME_FORMAT).plusDays(ONE_DAY))) {
             context.buildConstraintViolationWithTemplate(ErrorMessages.OUTSIDE_INPUT_WINDOW.getMessage())
                     .addPropertyNode("startTime").addConstraintViolation();
             isValid = false;
@@ -37,7 +38,7 @@ public class InputHoursValidator implements ConstraintValidator<InputHoursConstr
                     .addPropertyNode("endTime").addConstraintViolation();
             isValid = false;
         } else if (value.getEndTime().isBefore(DateTime.parse(EARLIEST_START_TIME, HOURS_TIME_FORMAT))
-                || value.getEndTime().isAfter(DateTime.parse(LATEST_END_TIME, HOURS_TIME_FORMAT).plusDays(1))) {
+                || value.getEndTime().isAfter(DateTime.parse(LATEST_END_TIME, HOURS_TIME_FORMAT).plusDays(ONE_DAY))) {
             context.buildConstraintViolationWithTemplate(ErrorMessages.OUTSIDE_INPUT_WINDOW.getMessage())
                     .addPropertyNode("endTime").addConstraintViolation();
             isValid = false;

@@ -21,6 +21,9 @@ public class HoursCalculationServiceImpl implements HoursCalculationService {
     private static final BigDecimal AFTER_BED_SALARY = BigDecimal.valueOf(8.00);
     private static final BigDecimal AFTER_MIDNIGHT_SALARY = BigDecimal.valueOf(16.00);
     private static final Integer TWO_DECIMAL_PLACES = 2;
+    private static final Integer ZERO_MINUTES = 0;
+    private static final Integer ONE_HOUR = 1;
+    private static final Integer ONE_DAY = 1;
 
     @Override
     public String calculateSalaryEarned(DateTime startTime, DateTime endTime) {
@@ -41,9 +44,9 @@ public class HoursCalculationServiceImpl implements HoursCalculationService {
     }
 
     private DateTime roundToNearestHour(DateTime hourToRound) {
-        if (hourToRound.getMinuteOfHour() > 0) {
-            hourToRound = hourToRound.withMinuteOfHour(0);
-            hourToRound = hourToRound.plusHours(1);
+        if (hourToRound.getMinuteOfHour() > ZERO_MINUTES) {
+            hourToRound = hourToRound.withMinuteOfHour(ZERO_MINUTES);
+            hourToRound = hourToRound.plusHours(ONE_HOUR);
         }
         return hourToRound;
     }
@@ -59,15 +62,15 @@ public class HoursCalculationServiceImpl implements HoursCalculationService {
     private Integer calculateHoursWorkedAfterBedBeforeMidnight(Interval intervalWorked) {
         Interval beforeMidnightInterval = new Interval(
                 DateTime.parse(BED_TIME, HOURS_TIME_FORMAT),
-                DateTime.parse(MIDNIGHT, HOURS_TIME_FORMAT).plusDays(1)
+                DateTime.parse(MIDNIGHT, HOURS_TIME_FORMAT).plusDays(ONE_DAY)
         );
         return Hours.hoursIn(intervalWorked.overlap(beforeMidnightInterval)).getHours();
     }
 
     private Integer calculateHoursWorkedAfterMidnight(Interval intervalWorked) {
         Interval afterMidnightInterval = new Interval(
-                DateTime.parse(MIDNIGHT, HOURS_TIME_FORMAT).plusDays(1),
-                DateTime.parse(LATEST_END_TIME, HOURS_TIME_FORMAT).plusDays(1)
+                DateTime.parse(MIDNIGHT, HOURS_TIME_FORMAT).plusDays(ONE_DAY),
+                DateTime.parse(LATEST_END_TIME, HOURS_TIME_FORMAT).plusDays(ONE_DAY)
         );
         return Hours.hoursIn(intervalWorked.overlap(afterMidnightInterval)).getHours();
     }
