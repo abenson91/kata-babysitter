@@ -19,6 +19,7 @@ I want to calculate my nightly charge<br>*
 
 ## Assumption
 Bed time starts at 8PM
+Time rounds to next hour if input is partial hour i.e. 5:01PM will round to 6:00PM for salary calculation
 
 ## Run Instructions
 Requires Maven and Java 1.8
